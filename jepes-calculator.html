@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .center {
+                text-align: center;
+            }
+            .bold {
+                font-weight: bold;
+            }
+            .inline {
+                display: inline;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <!--  Title  -->
+            <h2 class="center">JEPES Scoring Calculator</h2>
+            <h4 class="center">
+                <a href="https://www.marines.mil/Portals/1/Publications/MCO%201616.1.pdf?ver=2pWMQ3wSas3g628sXsBV4g%3d%3d">MCO 1616.1 (see Appendix B for format)</a>
+            </h4>
+        </header>
+        <form action="" method="get" class="jepes-scoring-form">
+            <div class="bold">
+                <!--  ID line 1  -->
+                <label for="mroname" class="bold">MRO NAME:</label>
+                <input type="text" id="mroname" name="id" required size="10" pattern="[A-Za-z ]+"/>  
+                <label for="edipi" class="bold">EDIPI:</label>
+                <input type="text" id="edipi" name="id" required size="10" pattern="[0-9]{10}"/>
+                <label for="rank" class="bold">RANK:</label>
+                <select id="rank" name="id" onchange="resetRankValues()">
+                    <option value="LCPL">LCPL</option>
+                    <option value="CPL">CPL</option>
+                </select><br/>
+                <!--  ID line 2  -->
+                <label for="afadbd" class="bold">AFADBD:</label> <!-- afadbd is Armed Forces Active Duty Base Date, the day you joined  -->
+                <input type="date" id="afadbd" name="id" required size="10"/>
+    
+                <label for="pdor" class="bold">Present Date of Rank:</label>
+                <input type="date" id="pdor" name="id" required size="10"/><br>
+            </div>
+            <div>
+                <ol type="1">
+                    <li>
+                        <p class="inline">Warfighting</p>
+                        <ol type="a">
+                            <li>
+                                <p  class="inline">Rifle Score: </p>
+                                <label for="rifle-score">(SCORE)</label>
+                                <input type="number" id="rifle-score" name="warfighting" onchange="calculateRifleScoreValue()" required size="10" min="0" max="350"/>
+                                <label for="rifle-value">(VALUE)</label>
+                                <input type="number" id="rifle-value" name="warfighting" readonly value="0" size="10" min="0"/>
+                                <label for="rifle-qual">(DATE OF QUAL)</label>
+                                <input type="date" id="rifle-qual" name="warfighting" required size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">MCMAP:</p>
+                                <label for="mcmap-belt">(BELT LVL)</label>
+                                <select id="mcmap-belt" name="warfighting" onchange="calculateMCMAPBeltValue()">
+                                    <option value="UNQUAL">UNQUAL</option>
+                                    <option value="TAN">TAN</option>
+                                    <option value="GREY">GREY</option>
+                                    <option value="GREEN">GREEN</option>
+                                    <option value="GREEN INSTRUCTOR">GREEN INSTRUCTOR</option>
+                                    <option value="BROWN">BROWN</option>
+                                    <option value="BROWN INSTRUCTOR">BROWN INSTRUCTOR</option>
+                                    <option value="BLACK">BLACK</option>
+                                    <option value="BLACK INSTRUCTOR">BLACK INSTRUCTOR</option>
+                                </select>
+                                <label for="mcmap-value">(VALUE)</label>
+                                <input type="number" id="mcmap-value" name="warfighting" readonly value="0" size="10">/
+                                <label for="mcmap-qual">(DATE OF QUAL)</label>
+                                <input type="date" id="mcmap-qual" name="warfighting" required size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">LINE (1a + 1b) VALUE:</p>
+                                <input type="number" id="warfighting-total" name="warfighting" readonly value="0" required size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">Warfighting Comp. (1c x 1.25):</p>
+                                <input type="number" id="warfighting-comp" name="warfighting" readonly value="0" size="10" max="250"/>
+                                <strong>(ROUND-MAX 250)</strong>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p class="inline">Physical Toughness</p>
+                        <ol type="a">
+                            <li>
+                                <p class="inline">PFT:</p>
+                                <label for="pft-score">(SCORE)</label>
+                                <input type="number" id="pft-score" name="physicalToughness" onchange="calculatePFTValue()" required size="10" max="300"/>
+                                <label for="pft-value">(VALUE)</label>
+                                <input type="number" id="pft-value" name="physicalToughness" readonly value="0" size="10"/>
+                                <label for="pft-qual">(EFFECTIVE DATE)</label>
+                                <input type="date" id="pft-qual" name="physicalToughness" required size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">CFT:</p>
+                                <label for="cft-score">(SCORE)</label>
+                                <input type="number" id="cft-score" name="physicalToughness" onchange="calculateCFTValue()" required size="10" max="300"/>
+                                <label for="cft-value">(VALUE)</label>
+                                <input type="number" id="cft-value" name="physicalToughness" readonly value="0" size="10"/>
+                                <label for="cft-qual">(EFFECTIVE DATE)</label>
+                                <input type="date" id="cft-qual" name="physicalToughness" required size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">LINE (2a + 2b) VALUE:</p>
+                                <input type="number" id="physicalToughness-total" name="physicalToughness" readonly value="0" size="10"/>
+                            </li>
+                            <li>
+                                <p class="inline">PT Comp. (2c x 1.25):</p>
+                                <input type="number" id="physicalToughness-comp" name="physicalToughness-comp" readonly value="0" size="10" max="250"/>
+                                <strong>(ROUND-MAX 250)</strong>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>Mental Agility: (SEE ATTACHED DOCUMENTATION FOR VALUE COMPUTATION)</li>
+                    <ol type="a">
+                        <li>
+                            MARINENET courses:
+                            <label for="marinenet-value">(VALUE)</label>
+                            <input type="number" id="marinenet-value" name="mentalAgility" onchange="calculateMentalAgilityTotal()" value="0" required size="10" max="100"/>
+                            <!-- 
+                                this value is calculcated prior to filling out
+                                cross-reference courses completed by MRO on MarineNet since DOR with 
+                                list on https://www.marinenet.usmc.mil/MarineNet/Links/Points.aspx 
+                                and add CEU values together
+                            -->
+                            <strong>(MAX 100)</strong>
+                        </li>
+                        <li>
+                            Degrees:
+                            <label for="degrees-value">(VALUE)</label>
+                            <input type="number" id="degrees-value" name="mentalAgility" onchange="calculateMentalAgilityTotal()" value="0" required size="10" max="40"/>
+                            <!--
+                                this value is calculcated prior to filling out
+                                MRO has 0 bachelor's (code K) or associate's (code D) in MCTFS = 0
+                                MRO has 1+ bachelor's (code K) in MCTFS = 40
+                                MRO has 0 bachelor's (code K) and 1 associate's (code D) in MCTFS = 20
+                                MRO had 0 bachelor's (code K) and 2+ associate's (code D) in MCTFS = 40
+                            -->
+                            <strong>(MAX 40)</strong>
+                        </li>
+                        <li>
+                            CRS-SVS:
+                            <label for="crs-svs-num">(Num. Completed Courses)</label> <!-- off duty course education in service -->
+                            <input type="number" id="crs-svs-num" name="mentalAgility" onchange="calculateCrsSvsValue()" required size="10" min="0"/>
+                            <!-- number of off-duty education courses listed in MCTFS completed/passed between MRO's AFADBD and DOR -->
+                            x 10
+                            <label for="crs-svs-value">(VALUE)</label> 
+                            <input type="number" id="crs-svs-value" name="mentalAgility" readonly value="0" size="10" max="30"/>
+                            <strong>(MAX 30)</strong>
+                        </li>
+                        <li>
+                            CRS-GRD:
+                            <label for="crs-grd-num">(Num. Completed Courses)</label> <!-- off duty education course in grade -->
+                            <input type="number" id="crs-grd-num" name="mentalAgility" onchange="calculateCrsGrdValue()" required size="10" min="0"/>
+                            <!-- number of off-duty education courses listed in MCTFS completed/passed since MRO's DOR -->
+                            x 10
+                            <label for="crs-grd-value">(VALUE)</label>
+                            <input type="number" id="crs-grd-value" name="mentalAgility" readonly value="0" size="10" max="30"/>
+                            <strong>(MAX 30)</strong>
+                        </li>
+                        <li>
+                            LINE (3a+3b+3c+3d) VALUE:
+                            <label for="mentalAgility-total">(VALUE)</label>
+                            <input type="number" id="mentalAgility-total" name="mentalAgility" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            Mental Agility Comp.(3e x 1.25):
+                            <label for="mentalAgility-comp">(VALUE)</label>
+                            <input type="number" id="mentalAgility-comp" name="mentalAgility" readonly value="0" size="10"/>
+                            <strong>(ROUND-MAX 250)</strong>
+                        </li>
+                    </ol>
+                    <li>CMD Input (AVG SCORE IN GRADE 0.0-5.0):</li>
+                    <ol type="a">
+                        <li>
+                            MOS/MSN
+                            <input type="number" id="mos/msn-num" name="commandInput" onchange="calculateMOSMSNValue()" value="0.0" required size="10"/>
+                            x 50
+                            <label for="mos/msn-value">(VALUE)</label>
+                            <input type="number" id="mos/msn-value" name="commandInput" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            Leadership
+                            <input type="number" id="leadership-num" name="commandInput"onchange="calculateLeadershipValue()" value="0.0" required size="10"/>
+                            x 50
+                            <label for="leadership-value">(VALUE)</label>
+                            <input type="number" id="leadership-value" name="commandInput" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            Character
+                            <input type="number" id="character-num" name="commandInput"onchange="calculateCharacterValue()" value="0.0" required size="10"/>
+                            x 50
+                            <label for="character-value">(VALUE)</label>
+                            <input type="number" id="character-value" name="commandInput" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            LINE (4a + 4b + 4c) VALUE:
+                            <label for="commandInput-total">(VALUE)</label>
+                            <input type="number" id="commandInput-total" name="commandInput" readonly value="0" size="10" min="0"/>
+                        </li>
+                        <li>
+                            CMD Input Comp. (4d / 3):
+                            <label for="commandInput-comp">(VALUE)</label>
+                            <input type="number" id="commandInput-comp" name="commandInput" readonly value="0" size="10" min="0" max="250"/>
+                            <strong>(ROUND-MAX 250)</strong>
+                        </li>
+                    </ol>
+                    <li>Bonus (Click one) (VALUE: YES = 50, NO = 0)</li>
+                    <ol type="a">
+                        <li>
+                            <p class="inline">DI School:</p>
+                            <label for="di-yes">Yes</label>
+                            <input type="radio" id="di-yes" name="di" onchange="calculateDIValue()" value="50"/>
+                            <label for="di-no">No</label>
+                            <input type="radio" id="di-no" name="di" onchange="calculateDIValue()" value="0" checked/>
+                            <label for="di-value">(VALUE)</label>
+                            <input type="number" id="di-value" name="di-value" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            <p class="inline">Recruiter School:</p>
+                            <label for="rs-yes">Yes</label>
+                            <input type="radio" id="rs-yes" name="rs" onchange="calculateRSValue()" value="50"/>
+                            <label for="rs-no">No</label>
+                            <input type="radio" id="rs-no" name="rs" onchange="calculateRSValue()" value="0" checked/>
+                            <label for="rs-value">(VALUE)</label>
+                            <input type="number" id="rs-value" name="rs-value" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            <p class="inline">MSG School:</p>
+                            <label for="msg-yes">Yes</label>
+                            <input type="radio" id="msg-yes" name="msg" onchange="calculateMSGValue()" value="50"/>
+                            <label for="msg-no">No</label>
+                            <input type="radio" id="msg-no" name="msg" onchange="calculateMSGValue()" value="0" checked/>
+                            <label for="msg-value">(VALUE)</label>
+                            <input type="number" id="msg-value" name="msg-value" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            <p class="inline">Combat Instructor:</p>
+                            <label for="ci-yes">Yes</label>
+                            <input type="radio" id="ci-yes" name="ci" onchange="calculateCIValue()" value="50"/>
+                            <label for="ci-no">No</label>
+                            <input type="radio" id="ci-no" name="ci" onchange="calculateCIValue()" value="0" checked/>
+                            <label for="ci-value">(VALUE)</label>
+                            <input type="number" id="ci-value" name="ci-value" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            <p class="inline">MC Sec. Forces:</p>
+                            <label for="sec-yes">Yes</label>
+                            <input type="radio" id="sec-yes" name="sec" onchange="calculateSecValue()" value="50"/>
+                            <label for="sec-no">No</label>
+                            <input type="radio" id="sec-no" name="sec" onchange="calculateSecValue()" value="0" checked/>
+                            <label for="sec-value">(VALUE)</label>
+                            <input type="number" id="sec-value" name="bonus" readonly value="0" size="10"/>
+                        </li>
+                        <li>
+                            <p class="inline">Command Rec. Bonus:</p>
+                            <label for="cmd-rec-bonus">(Number)</label> <!-- this is the number of applicants you referred that enlisted in the Marine Corps (you may not carry this number to the next higher grade) -->
+                            <input type="number" id="cmd-rec-bonus-num" name="bonus" onchange="calculateCmdRecBonusValue()" value="0" required size="10">
+                            x20
+                            <input type="number" id="cmd-rec-bonus-value" name="bonus" value="0" readonly size="10">
+                            <strong>(MAX 100)</strong>
+                        </li>
+                        <li>
+                            <label for="bonus-total">LINE (5a+5b+5c+5d+5f) VALUE:</label>
+                            <input type="number" id="bonus-total" name="bonus" value="0" readonly size="10">
+                        </li>
+                        <li>
+                            <label for="bonus-comp">Bonus Comp. (5g):</label>
+                            <input type="number" id="bonus-comp" name="bonus" value="0" readonly size="10"1>
+                            <strong>(MAX 100)</strong>
+                        </li>
+                    </ol>
+                    <li>Total PES Score:</li>
+                    <ol type="a">
+                        <li>
+                            <label for="pes-total">LINE (1d+2d+3f+4e+5h):</label>
+                            <input type="number" id="pes-total" name="pes-total" readonly value="0" size="10"/>
+                            <strong>(MAX 1000)</strong>
+                        </li>
+                    </ol>
+                </ol>
+                <!-- <input type="submit" value="Send it!"/>  This section will be for printing the input data, if I ever get to it -->
+            </div>
+        </form>
+        <script>
+            // testing functions
+            function resetRankValues() {
+                //alert("Resetting values that change based on rank ..")
+                // Warfighting
+                document.getElementById("rifle-score").value = "0";
+                document.getElementById("mcmap-belt").value = "UNQUAL";
+                calculateWarfightingTotal(); // recalc fields with zero'd vals
+                // Physical Toughness
+                document.getElementById("pft-score").value = "0";
+                document.getElementById("cft-score").value = "0";
+                calculatePhysicalToughnessTotal();
+                // Mental Agility
+                // CMD Input
+                // Bonus
+            };
+
+            /* unused reset and testing functions
+
+            function resetAllValues() {
+                // ID Lines
+                document.getElementById("mroname").value = "";
+                document.getElementById("edipi").value = "";
+                document.getElementById("rank").value = "LCPL";
+                document.getElementById("afadbd").value = "";
+                document.getElementById("pdor").value = "";
+
+                // Warfighting
+                document.getElementById("rifle-score").value = "0";
+                document.getElementById("rifle-qual").value = "";
+                document.getElementById("mcmap-belt").value = "UNQUAL";
+                document.getElementById("mcmap-qual").value = "";
+                calculateWarfightingTotal(); // recalc fields with zero'd vals
+
+                // Physical Toughness
+                document.getElementById("pft-score").value = "0";
+                document.getElementById("pft-qual").value = "";
+                document.getElementById("cft-score").value = "0";
+                document.getElementById("cft-qual").value = "";
+                calculatePhysicalToughnessTotal();
+
+                // Mental Agility
+                document.getElementById("marinenet-value").value = "0";
+                document.getElementById("degrees-value").value = "0";
+                document.getElementById("crs-svs-num").value = "0";
+                document.getElementById("crs-grd-num").value = "0";
+                calculateMentalAgilityTotal(); 
+
+                // CMD Input
+                document.getElementById("mos-msn-num").value = "0.0";
+                document.getElementById("leadership-num").value = "0.0";
+                document.getElementById("character-num").value = "0.0";
+                calculateCommandInputTotal();
+
+                // Bonus
+                document.getElementById("di-no").checked = true;
+                document.getElementById("rs-no").checked = true;
+                document.getElementById("msg-no").checked = true;
+                document.getElementById("ci-no").checked = true;
+                document.getElementById("sec-no").checked = true;
+                document.getElementById("cmd-rec-bonus-num").value = "0";
+                calculateBonusTotal();
+            };
+
+            function insertTestValues() {
+                // read current date into glocal vars
+                var [currentDate, currentTime] = formatDate( new Date()).split("");
+                alert(currentDate);
+
+                // ID Lines
+                document.getElementById("mroname").value = "John Smith";
+                document.getElementById("edipi").value = "1234567890";
+                document.getElementById("rank").value = "CPL";
+                document.getElementById("afadbd").value = currentDate;
+                document.getElementById("pdor").value = currentDate;
+
+                // Warfighting
+                document.getElementById("rifle-score").value = "0";
+                document.getElementById("rifle-qual").value = currentDate;
+                document.getElementById("mcmap-belt").value = "UNQUAL";
+                document.getElementById("mcmap-qual").value = currentDate;
+                calculateWarfightingTotal(); // recalc fields with zero'd vals
+
+                // Physical Toughness
+                document.getElementById("pft-score").value = "0";
+                document.getElementById("pft-qual").value = currentDate;
+                document.getElementById("cft-score").value = "0";
+                document.getElementById("cft-qual").value = currentDate;
+                calculatePhysicalToughnessTotal();
+
+                // Mental Agility
+                document.getElementById("marinenet-value").value = "0";
+                document.getElementById("degrees-value").value = "0";
+                document.getElementById("crs-svs-num").value = "0";
+                document.getElementById("crs-grd-num").value = "0";
+                calculateMentalAgilityTotal(); 
+
+                // CMD Input
+                document.getElementById("mos-msn-num").value = "0.0";
+                document.getElementById("leadership-num").value = "0.0";
+                document.getElementById("character-num").value = "0.0";
+                calculateCommandInputTotal();
+
+                // Bonus
+                document.getElementById("di-no").checked = true;
+                document.getElementById("rs-no").checked = true;
+                document.getElementById("msg-no").checked = true;
+                document.getElementById("ci-no").checked = true;
+                document.getElementById("sec-no").checked = true;
+                document.getElementById("cmd-rec-bonus-num").value = "0";
+                calculateBonusTotal();
+            };
+            */
+
+            // the values for Rifle, CFT, and PFT scores are a percentile of peers of the same rank, and are updated yearly
+            // this site is currently using the table provided with MCO 1616.1 and is inaccurate in that regard
+
+            // Warfighting
+            function calculateRifleScoreValue() {
+                // read element objects into glocal vars
+                var rank = document.getElementById("rank").value;
+                var rifleScore = document.getElementById("rifle-score").value;
+                
+                // kv pairs for rifle score
+                const lcpl_s2v_kv = [];
+                const cpl_s2v_kv = [];
+
+                //rather than store 350 values, store programmatically and build as desired
+                function fill_lcpl_kv() {
+                    for ( let i = 0; i < 250; i++ ) { lcpl_s2v_kv[i] = 0; };
+                    lcpl_s2v_kv[250] = 4;
+                    for ( let i = 251; i < 267; i++ ) { lcpl_s2v_kv[i] = 5; };
+                    for ( let i = 267; i < 273; i++ ) { lcpl_s2v_kv[i] = 6; };
+                    for ( let i = 273; i < 276; i++ ) { lcpl_s2v_kv[i] = 7; };
+                    for ( let i = 276; i < 279; i++ ) { lcpl_s2v_kv[i] = 8; };
+                    lcpl_s2v_kv[279] = 9;
+                    for ( let i = 280; i < 282; i++ ) { lcpl_s2v_kv[i] = 10; };
+                    lcpl_s2v_kv[282] = 11;
+                    lcpl_s2v_kv[283] = 12;
+                    lcpl_s2v_kv[284] = 13;
+                    lcpl_s2v_kv[285] = 14;
+                    lcpl_s2v_kv[286] = 15;
+                    lcpl_s2v_kv[287] = 16;
+                    lcpl_s2v_kv[288] = 17;
+                    lcpl_s2v_kv[289] = 18;
+                    lcpl_s2v_kv[290] = 19;
+                    lcpl_s2v_kv[291] = 21;
+                    lcpl_s2v_kv[292] = 22;
+                    lcpl_s2v_kv[293] = 23;
+                    lcpl_s2v_kv[294] = 25;
+                    lcpl_s2v_kv[295] = 26;
+                    lcpl_s2v_kv[296] = 28;
+                    lcpl_s2v_kv[297] = 29;
+                    lcpl_s2v_kv[298] = 31;
+                    lcpl_s2v_kv[299] = 33;
+                    lcpl_s2v_kv[300] = 34;
+                    lcpl_s2v_kv[301] = 36;
+                    lcpl_s2v_kv[302] = 38;
+                    lcpl_s2v_kv[303] = 40;
+                    lcpl_s2v_kv[304] = 42;
+                    lcpl_s2v_kv[305] = 44;
+                    lcpl_s2v_kv[306] = 46;
+                    lcpl_s2v_kv[307] = 48;
+                    lcpl_s2v_kv[308] = 50;
+                    lcpl_s2v_kv[309] = 53;
+                    lcpl_s2v_kv[310] = 55;
+                    lcpl_s2v_kv[311] = 58;
+                    lcpl_s2v_kv[312] = 60;
+                    lcpl_s2v_kv[313] = 62;
+                    lcpl_s2v_kv[314] = 65;
+                    lcpl_s2v_kv[315] = 67;
+                    lcpl_s2v_kv[316] = 69; // nice
+                    lcpl_s2v_kv[317] = 72;
+                    lcpl_s2v_kv[318] = 74;
+                    lcpl_s2v_kv[319] = 76;
+                    lcpl_s2v_kv[320] = 78;
+                    lcpl_s2v_kv[321] = 80;
+                    lcpl_s2v_kv[322] = 82;
+                    lcpl_s2v_kv[323] = 84;
+                    lcpl_s2v_kv[324] = 86;
+                    lcpl_s2v_kv[325] = 88;
+                    lcpl_s2v_kv[326] = 89;
+                    lcpl_s2v_kv[327] = 90;
+                    lcpl_s2v_kv[328] = 91;
+                    lcpl_s2v_kv[329] = 93;
+                    lcpl_s2v_kv[330] = 94;
+                    lcpl_s2v_kv[331] = 95;
+                    lcpl_s2v_kv[332] = 96;
+                    lcpl_s2v_kv[333] = 97;
+                    for ( let i = 334; i < 336; i++ ) { lcpl_s2v_kv[i] = 98; };
+                    for ( let i = 336; i < 339; i++ ) { lcpl_s2v_kv[i] = 99; };
+                    for ( let i = 339; i < 351; i++ ) { lcpl_s2v_kv[i] = 100; };
+                    //fin
+                };
+                function fill_cpl_kv() {
+                    for( let i = 0; i < 250; i++ ) { cpl_s2v_kv[i] = 0; };
+                    cpl_s2v_kv[250] = 1;
+                    for ( let i = 251; i < 259; i++ ) { cpl_s2v_kv[i] = 2; };
+                    for ( let i = 259; i < 275; i++ ) { cpl_s2v_kv[i] = 3; };
+                    for ( let i = 275; i < 280; i++ ) { cpl_s2v_kv[i] = 4; };
+                    for ( let i = 280; i < 282; i++ ) { cpl_s2v_kv[i] = 5; };
+                    for ( let i = 282; i < 285; i++ ) { cpl_s2v_kv[i] = 6; };
+                    cpl_s2v_kv[285] = 7;
+                    for ( let i = 286; i < 288; i++ ) { cpl_s2v_kv[i] = 8; };
+                    cpl_s2v_kv[288] = 9;
+                    cpl_s2v_kv[289] = 10;
+                    cpl_s2v_kv[290] = 11;
+                    cpl_s2v_kv[291] = 12;
+                    cpl_s2v_kv[292] = 13;
+                    cpl_s2v_kv[293] = 14;
+                    cpl_s2v_kv[294] = 15;
+                    cpl_s2v_kv[295] = 16;
+                    cpl_s2v_kv[296] = 17;
+                    cpl_s2v_kv[297] = 19;
+                    cpl_s2v_kv[298] = 20;
+                    cpl_s2v_kv[299] = 21;
+                    cpl_s2v_kv[300] = 23;
+                    cpl_s2v_kv[301] = 24;
+                    cpl_s2v_kv[302] = 26;
+                    cpl_s2v_kv[303] = 27;
+                    cpl_s2v_kv[304] = 29;
+                    cpl_s2v_kv[305] = 31;
+                    cpl_s2v_kv[306] = 33;
+                    cpl_s2v_kv[307] = 36;
+                    cpl_s2v_kv[308] = 38;
+                    cpl_s2v_kv[309] = 41;
+                    cpl_s2v_kv[310] = 43;
+                    cpl_s2v_kv[311] = 45;
+                    cpl_s2v_kv[312] = 48;
+                    cpl_s2v_kv[313] = 51;
+                    cpl_s2v_kv[314] = 53;
+                    cpl_s2v_kv[315] = 56;
+                    cpl_s2v_kv[316] = 59;
+                    cpl_s2v_kv[317] = 61;
+                    cpl_s2v_kv[318] = 64;
+                    cpl_s2v_kv[319] = 66;
+                    cpl_s2v_kv[320] = 69; 
+                    cpl_s2v_kv[321] = 71;
+                    cpl_s2v_kv[322] = 74;
+                    cpl_s2v_kv[323] = 76;
+                    cpl_s2v_kv[324] = 78;
+                    cpl_s2v_kv[325] = 81; 
+                    cpl_s2v_kv[326] = 83; 
+                    cpl_s2v_kv[327] = 85;
+                    cpl_s2v_kv[328] = 87;
+                    cpl_s2v_kv[329] = 88;
+                    cpl_s2v_kv[330] = 90;
+                    cpl_s2v_kv[331] = 92;
+                    cpl_s2v_kv[332] = 93;
+                    cpl_s2v_kv[333] = 94;
+                    cpl_s2v_kv[334] = 95;
+                    cpl_s2v_kv[335] = 96;
+                    cpl_s2v_kv[336] = 97;
+                    for ( let i = 337; i < 339; i++ ) { cpl_s2v_kv[i] = 98; };
+                    for ( let i = 339; i < 341; i++ ) { cpl_s2v_kv[i] = 99; };
+                    for ( let i = 341; i < 351; i++ ) { cpl_s2v_kv[i] = 100; };
+                };
+
+                switch(rank) {
+                    case "LCPL":
+                        fill_lcpl_kv();
+                        var rifleValue = lcpl_s2v_kv[rifleScore];
+                        document.getElementById("rifle-value").value = rifleValue;
+                        break;
+                    case "CPL":
+                        fill_cpl_kv();
+                        var rifleValue = cpl_s2v_kv[rifleScore];
+                        document.getElementById("rifle-value").value = rifleValue;
+                        break;
+                    default:
+                        //pass
+                };
+                calculateWarfightingTotal();
+            };
+
+            function calculateMCMAPBeltValue() {
+                // read element objects into vars
+                var rank = document.getElementById("rank").value;
+                var beltColor = document.getElementById("mcmap-belt").value;
+
+                // horrible practice and highly janky, replace with objects asap
+                switch(rank) {
+                    //switch by rank (scoring schema different from CPL)
+                    case "LCPL":
+                        //switch by belt color (different scores)
+                        switch(beltColor) {
+                            case "UNQUAL":
+                                document.getElementById("mcmap-value").value = "0";
+                                break;
+                            case "TAN":
+                                document.getElementById("mcmap-value").value = "33";
+                                break;
+                            case "GREY":
+                                document.getElementById("mcmap-value").value = "67";
+                            default:
+                                document.getElementById("mcmap-value").value = "100";
+                        };
+                        break;
+                    case "CPL":
+                        switch(beltColor) {
+                            case "UNQUAL":
+                                document.getElementById("mcmap-value").value =  "0";
+                                break;
+                            case "TAN":
+                                document.getElementById("mcmap-value").value =  "16";
+                                break;
+                            case "GREY":
+                                document.getElementById("mcmap-value").value =  "33";
+                                break;
+                            case "GREEN":
+                                document.getElementById("mcmap-value").value =  "50";
+                                break;
+                            case "GREEN INSTRUCTOR":
+                                document.getElementById("mcmap-value").value =  "66";
+                                break;
+                            case "BROWN":
+                                document.getElementById("mcmap-value").value =  "83";
+                                break;
+                            default:
+                                document.getElementById("mcmap-value").value =  "100";
+                        };
+                        break;
+                    default:
+                        //pass
+                };
+                calculateWarfightingTotal();
+            };
+
+            function calculateWarfightingTotal() {
+                // add 1a + 1b
+                var beltValue = document.getElementById("mcmap-value").value;
+                var rifleValue = document.getElementById("rifle-value").value;
+                var addTotal = +beltValue + +rifleValue;
+                document.getElementById("warfighting-total").value = addTotal;
+
+                // calculate total (1c * 1.25)
+                var compTotal = Math.round(addTotal * 1.25); // round to nearest whole number, .49 down .5 up
+                document.getElementById("warfighting-comp").value = compTotal;
+
+                // update PES score
+                calculateTotalPESScore();
+            };
+            
+            // Physical Toughness
+            function calculatePFTValue() {
+                // read element objects into glocal vars
+                var rank = document.getElementById("rank").value;
+                var pftScore = document.getElementById("pft-score").value;
+
+                // kv pairs for pft score
+                const lcpl_s2v_kv = [];
+                const cpl_s2v_kv = [];
+
+                // kv filler functions
+                function fill_lcpl_kv() {
+                    for ( let i = 0; i < 150; i++ ) { lcpl_s2v_kv[i] = 0; };
+                    lcpl_s2v_kv[150] = 1;
+                    for ( let i = 151; i < 159; i++ ) { lcpl_s2v_kv[i] = 2; };
+                    for ( let i = 159; i < 167; i++ ) { lcpl_s2v_kv[i] = 3; };
+                    for ( let i = 167; i < 174; i++ ) { lcpl_s2v_kv[i] = 4; };
+                    for ( let i = 174; i < 179; i++ ) { lcpl_s2v_kv[i] = 5; };
+                    for ( let i = 179; i < 184; i++ ) { lcpl_s2v_kv[i] = 6; };
+                    for ( let i = 184; i < 188; i++ ) { lcpl_s2v_kv[i] = 7; };
+                    for ( let i = 188; i < 191; i++ ) { lcpl_s2v_kv[i] = 8; };
+                    for ( let i = 191; i < 194; i++ ) { lcpl_s2v_kv[i] = 9; };
+                    for ( let i = 194; i < 197; i++ ) { lcpl_s2v_kv[i] = 10; };
+                    for ( let i = 197; i < 199; i++ ) { lcpl_s2v_kv[i] = 11; };
+                    for ( let i = 199; i < 201; i++ ) { lcpl_s2v_kv[i] = 12; };
+                    for ( let i = 201; i < 203; i++ ) { lcpl_s2v_kv[i] = 13; };
+                    for ( let i = 203; i < 205; i++ ) { lcpl_s2v_kv[i] = 14; };
+                    for ( let i = 205; i < 207; i++ ) { lcpl_s2v_kv[i] = 15; };
+                    lcpl_s2v_kv[207] = 16;
+                    for ( let i = 208; i < 210; i++ ) { lcpl_s2v_kv[i] = 17; };
+                    lcpl_s2v_kv[210] = 18;
+                    for ( let i = 211; i < 213; i++ ) { lcpl_s2v_kv[i] = 19; };
+                    lcpl_s2v_kv[213] = 20;
+                    for ( let i = 214; i < 216; i++ ) { lcpl_s2v_kv[i] = 21; };
+                    lcpl_s2v_kv[216] = 22;
+                    lcpl_s2v_kv[217] = 23;
+                    lcpl_s2v_kv[218] = 24;
+                    for ( let i = 219; i < 221; i++ ) { lcpl_s2v_kv[i] = 25; };
+                    lcpl_s2v_kv[221] = 26;
+                    lcpl_s2v_kv[222] = 27;
+                    lcpl_s2v_kv[223] = 28;
+                    lcpl_s2v_kv[224] = 29;
+                    lcpl_s2v_kv[225] = 30;
+                    lcpl_s2v_kv[226] = 31;
+                    lcpl_s2v_kv[227] = 32;
+                    for ( let i = 228; i < 230; i++ ) { lcpl_s2v_kv[i] = 33 };
+                    lcpl_s2v_kv[230] = 34;
+                    lcpl_s2v_kv[231] = 35;
+                    lcpl_s2v_kv[232] = 36;
+                    lcpl_s2v_kv[233] = 37;
+                    lcpl_s2v_kv[234] = 38;
+                    lcpl_s2v_kv[235] = 40;
+                    lcpl_s2v_kv[236] = 41;
+                    lcpl_s2v_kv[237] = 42;
+                    lcpl_s2v_kv[238] = 43;
+                    lcpl_s2v_kv[239] = 45;
+                    lcpl_s2v_kv[240] = 46;
+                    lcpl_s2v_kv[241] = 47;
+                    lcpl_s2v_kv[242] = 49;
+                    lcpl_s2v_kv[243] = 50;
+                    lcpl_s2v_kv[244] = 51;
+                    lcpl_s2v_kv[245] = 52;
+                    lcpl_s2v_kv[246] = 54;
+                    lcpl_s2v_kv[247] = 55;
+                    lcpl_s2v_kv[248] = 56;
+                    lcpl_s2v_kv[249] = 58;
+                    lcpl_s2v_kv[250] = 59;
+                    lcpl_s2v_kv[251] = 60;
+                    lcpl_s2v_kv[252] = 61;
+                    lcpl_s2v_kv[253] = 63;
+                    lcpl_s2v_kv[254] = 64;
+                    lcpl_s2v_kv[255] = 65;
+                    lcpl_s2v_kv[256] = 66;
+                    lcpl_s2v_kv[257] = 67;
+                    lcpl_s2v_kv[258] = 69; 
+                    lcpl_s2v_kv[259] = 70;
+                    lcpl_s2v_kv[260] = 71;
+                    lcpl_s2v_kv[261] = 72;
+                    lcpl_s2v_kv[262] = 73;
+                    lcpl_s2v_kv[263] = 75;
+                    lcpl_s2v_kv[264] = 76;
+                    lcpl_s2v_kv[265] = 77;
+                    lcpl_s2v_kv[266] = 78; 
+                    lcpl_s2v_kv[267] = 79;
+                    lcpl_s2v_kv[268] = 80;
+                    lcpl_s2v_kv[269] = 81; 
+                    lcpl_s2v_kv[270] = 82;
+                    lcpl_s2v_kv[271] = 83; 
+                    lcpl_s2v_kv[272] = 84;
+                    lcpl_s2v_kv[273] = 85; 
+                    lcpl_s2v_kv[274] = 86;
+                    lcpl_s2v_kv[275] = 87;
+                    lcpl_s2v_kv[276] = 88;
+                    lcpl_s2v_kv[277] = 89;
+                    lcpl_s2v_kv[278] = 90;
+                    lcpl_s2v_kv[279] = 91;
+                    lcpl_s2v_kv[280] = 92;
+                    for ( let i = 281; i < 283; i++ ) { lcpl_s2v_kv[i] = 93; };
+                    lcpl_s2v_kv[283] = 94;
+                    for ( let i = 284; i < 286; i++ ) { lcpl_s2v_kv[i] = 95; };
+                    for ( let i = 286; i < 288; i++ ) { lcpl_s2v_kv[i] = 96; };
+                    for ( let i = 288; i < 290; i++ ) { lcpl_s2v_kv[i] = 97; };
+                    for ( let i = 290; i < 292; i++ ) { lcpl_s2v_kv[i] = 98; };
+                    for ( let i = 292; i < 295; i++ ) { lcpl_s2v_kv[i] = 99; };
+                    for ( let i = 295; i < 301; i++ ) { lcpl_s2v_kv[i] = 100; };
+                };
+                function fill_cpl_kv() {
+                    for ( let i = 0; i < 150; i++ ) { cpl_s2v_kv[i] = 0; };
+                    cpl_s2v_kv[150] = 1;
+                    for ( let i = 151; i < 169; i++ ) { cpl_s2v_kv[i] = 2 };
+                    for ( let i = 169; i < 180; i++ ) { cpl_s2v_kv[i] = 3; };
+                    for ( let i = 180; i < 189; i++ ) { cpl_s2v_kv[i] = 4; };
+                    for ( let i = 189; i < 195; i++ ) { cpl_s2v_kv[i] = 5; };
+                    for ( let i = 195; i < 199; i++ ) { cpl_s2v_kv[i] = 6; };
+                    for ( let i = 199; i < 203; i++ ) { cpl_s2v_kv[i] = 7; };
+                    for ( let i = 203; i < 206; i++ ) { cpl_s2v_kv[i] = 8; };
+                    for ( let i = 206; i < 208; i++ ) { cpl_s2v_kv[i] = 9; };
+                    for ( let i = 208; i < 210; i++ ) { cpl_s2v_kv[i] = 10; };
+                    for ( let i = 210; i < 212; i++ ) { cpl_s2v_kv[i] = 11; };
+                    for ( let i = 212; i < 214; i++ ) { cpl_s2v_kv[i] = 12; };
+                    for ( let i = 214; i < 216; i++ ) { cpl_s2v_kv[i] = 13; };
+                    for ( let i = 216; i < 218; i++ ) { cpl_s2v_kv[i] = 14; };
+                    for ( let i = 218; i < 220; i++ ) { cpl_s2v_kv[i] = 15; };
+                    cpl_s2v_kv[220] = 16;
+                    for ( let i = 221; i < 223; i++ ) { cpl_s2v_kv[i] = 17; };
+                    cpl_s2v_kv[223] = 18;
+                    cpl_s2v_kv[224] = 19;
+                    for ( let i = 225; i < 227; i++ ) { cpl_s2v_kv[i] = 20; };
+                    cpl_s2v_kv[227] = 21;
+                    for ( let i = 228; i < 230; i++ ) { cpl_s2v_kv[i] = 22; };
+                    cpl_s2v_kv[230] = 23;
+                    cpl_s2v_kv[231] = 24;
+                    cpl_s2v_kv[232] = 25;
+                    cpl_s2v_kv[233] = 26;
+                    cpl_s2v_kv[234] = 27;
+                    cpl_s2v_kv[235] = 28;
+                    cpl_s2v_kv[236] = 29;
+                    cpl_s2v_kv[237] = 30;
+                    cpl_s2v_kv[238] = 31;
+                    cpl_s2v_kv[239] = 33;
+                    cpl_s2v_kv[240] = 34;
+                    cpl_s2v_kv[241] = 35;
+                    cpl_s2v_kv[242] = 37;
+                    cpl_s2v_kv[243] = 38;
+                    cpl_s2v_kv[244] = 39;
+                    cpl_s2v_kv[245] = 41;
+                    cpl_s2v_kv[246] = 42;
+                    cpl_s2v_kv[247] = 43;
+                    cpl_s2v_kv[248] = 44;
+                    cpl_s2v_kv[249] = 46;
+                    cpl_s2v_kv[250] = 47;
+                    cpl_s2v_kv[251] = 49;
+                    cpl_s2v_kv[252] = 50;
+                    cpl_s2v_kv[253] = 52;
+                    cpl_s2v_kv[254] = 53;
+                    cpl_s2v_kv[255] = 54;
+                    cpl_s2v_kv[256] = 56;
+                    cpl_s2v_kv[257] = 57;
+                    cpl_s2v_kv[258] = 58;
+                    cpl_s2v_kv[259] = 60;
+                    cpl_s2v_kv[260] = 61;
+                    cpl_s2v_kv[261] = 63;
+                    cpl_s2v_kv[262] = 64;
+                    cpl_s2v_kv[263] = 66;
+                    cpl_s2v_kv[264] = 67;
+                    cpl_s2v_kv[265] = 68;
+                    cpl_s2v_kv[266] = 70;
+                    cpl_s2v_kv[267] = 71;
+                    cpl_s2v_kv[268] = 73;
+                    cpl_s2v_kv[269] = 74;
+                    cpl_s2v_kv[270] = 76;
+                    cpl_s2v_kv[271] = 77;
+                    cpl_s2v_kv[272] = 78;
+                    cpl_s2v_kv[273] = 80;
+                    cpl_s2v_kv[274] = 81;
+                    cpl_s2v_kv[275] = 82;
+                    cpl_s2v_kv[276] = 84;
+                    cpl_s2v_kv[277] = 85;
+                    cpl_s2v_kv[278] = 86;
+                    cpl_s2v_kv[279] = 87;
+                    cpl_s2v_kv[280] = 88;
+                    cpl_s2v_kv[281] = 89;
+                    cpl_s2v_kv[282] = 90;
+                    cpl_s2v_kv[283] = 91;
+                    cpl_s2v_kv[284] = 92;
+                    for ( let i = 285; i < 287; i++ ) { cpl_s2v_kv[i] = 93; };
+                    cpl_s2v_kv[287] = 94;
+                    cpl_s2v_kv[288] = 95;
+                    for ( let i = 289; i < 291; i++ ) { cpl_s2v_kv[i] = 96; };
+                    for ( let i = 291; i < 293; i++ ) { cpl_s2v_kv[i] = 97; };
+                    for ( let i = 293; i < 295; i++ ) { cpl_s2v_kv[i] = 98; };
+                    for ( let i = 295; i < 299; i++ ) { cpl_s2v_kv[i] = 99; };
+                    for ( let i = 299; i < 301; i++ ) { cpl_s2v_kv[i] = 100; };
+                };
+
+                // switch based on rank
+                switch(rank) {
+                    case "LCPL":
+                        fill_lcpl_kv();
+                        var pftValue = lcpl_s2v_kv[pftScore];
+                        document.getElementById("pft-value").value = pftValue;
+                        break;
+                    case "CPL":
+                        fill_cpl_kv();
+                        var pftValue = cpl_s2v_kv[pftScore];
+                        document.getElementById("pft-value").value = pftValue;
+                        break;
+                    default:
+                        //insert
+                };
+                calculatePhysicalToughnessTotal();
+            };
+
+            function calculateCFTValue() {
+                // read element objects into glocal vars
+                var rank = document.getElementById("rank").value;
+                var cftScore = document.getElementById("cft-score").value;
+
+                // kv pairs for pft score
+                const lcpl_s2v_kv = [];
+                const cpl_s2v_kv = [];
+
+                // kv filler functions
+                function fill_lcpl_kv() {
+                    for ( let i = 0; i < 150; i++ ) { lcpl_s2v_kv[i] = 0; };
+                    for ( let i = 150; i < 174; i++ ) { lcpl_s2v_kv[i] = 1; };
+                    for ( let i = 174; i < 188; i++ ) { lcpl_s2v_kv[i] = 2; };
+                    for ( let i = 188; i < 197; i++ ) { lcpl_s2v_kv[i] = 3; };
+                    for ( let i = 197; i < 203; i++ ) { lcpl_s2v_kv[i] = 4; };
+                    for ( let i = 203; i < 208; i++ ) { lcpl_s2v_kv[i] = 5; };
+                    for ( let i = 208; i < 212; i++ ) { lcpl_s2v_kv[i] = 6; };
+                    for ( let i = 212; i < 216; i++ ) { lcpl_s2v_kv[i] = 7; };
+                    for ( let i = 216; i < 219; i++ ) { lcpl_s2v_kv[i] = 8; };
+                    for ( let i = 219; i < 221; i++ ) { lcpl_s2v_kv[i] = 9; };
+                    for ( let i = 221; i < 224; i++ ) { lcpl_s2v_kv[i] = 10; };
+                    for ( let i = 224; i < 226; i++ ) { lcpl_s2v_kv[i] = 11; };
+                    for ( let i = 226; i < 228; i++ ) { lcpl_s2v_kv[i] = 12; };
+                    for ( let i = 228; i < 230; i++ ) { lcpl_s2v_kv[i] = 13; };
+                    for ( let i = 230; i < 232; i++ ) { lcpl_s2v_kv[i] = 14; };
+                    for ( let i = 232; i < 233; i++ ) { lcpl_s2v_kv[i] = 15; };
+                    lcpl_s2v_kv[234] = 16;
+                    for ( let i = 235; i < 237; i++ ) { lcpl_s2v_kv[i] = 17; };
+                    lcpl_s2v_kv[237] = 18;
+                    for ( let i = 238; i < 240; i++ ) { lcpl_s2v_kv[i] = 19; };
+                    lcpl_s2v_kv[240] = 20;
+                    lcpl_s2v_kv[241] = 21;
+                    lcpl_s2v_kv[242] = 22;
+                    for ( let i = 243; i < 245; i++ ) { lcpl_s2v_kv[i] = 23; };
+                    lcpl_s2v_kv[245] = 24;
+                    lcpl_s2v_kv[246] = 25;
+                    lcpl_s2v_kv[247] = 26;
+                    lcpl_s2v_kv[248] = 27;
+                    lcpl_s2v_kv[249] = 28;
+                    lcpl_s2v_kv[250] = 29;
+                    lcpl_s2v_kv[251] = 30;
+                    lcpl_s2v_kv[252] = 31;
+                    lcpl_s2v_kv[253] = 32;
+                    lcpl_s2v_kv[254] = 34;
+                    lcpl_s2v_kv[255] = 35;
+                    lcpl_s2v_kv[256] = 36;
+                    lcpl_s2v_kv[257] = 37;
+                    lcpl_s2v_kv[258] = 38;
+                    lcpl_s2v_kv[259] = 40;
+                    lcpl_s2v_kv[260] = 41;
+                    lcpl_s2v_kv[261] = 42;
+                    lcpl_s2v_kv[262] = 44;
+                    lcpl_s2v_kv[263] = 45;
+                    lcpl_s2v_kv[264] = 46;
+                    lcpl_s2v_kv[265] = 48;
+                    lcpl_s2v_kv[266] = 49;
+                    lcpl_s2v_kv[267] = 50;
+                    lcpl_s2v_kv[268] = 52;
+                    lcpl_s2v_kv[269] = 53;
+                    lcpl_s2v_kv[270] = 54;
+                    lcpl_s2v_kv[271] = 56;
+                    lcpl_s2v_kv[272] = 57;
+                    lcpl_s2v_kv[273] = 59;
+                    lcpl_s2v_kv[274] = 60;
+                    lcpl_s2v_kv[275] = 62;
+                    lcpl_s2v_kv[276] = 63;
+                    lcpl_s2v_kv[277] = 65;
+                    lcpl_s2v_kv[278] = 66;
+                    lcpl_s2v_kv[279] = 68;
+                    lcpl_s2v_kv[280] = 69;
+                    lcpl_s2v_kv[281] = 70;
+                    lcpl_s2v_kv[282] = 72;
+                    lcpl_s2v_kv[283] = 74;
+                    lcpl_s2v_kv[284] = 75;
+                    lcpl_s2v_kv[285] = 76;
+                    lcpl_s2v_kv[286] = 78;
+                    lcpl_s2v_kv[287] = 79;
+                    lcpl_s2v_kv[288] = 81;
+                    lcpl_s2v_kv[289] = 82;
+                    lcpl_s2v_kv[290] = 83;
+                    lcpl_s2v_kv[291] = 85;
+                    lcpl_s2v_kv[292] = 86;
+                    lcpl_s2v_kv[293] = 87;
+                    lcpl_s2v_kv[294] = 89;
+                    lcpl_s2v_kv[295] = 90;
+                    lcpl_s2v_kv[296] = 91;
+                    lcpl_s2v_kv[297] = 92;
+                    lcpl_s2v_kv[298] = 93;
+                    lcpl_s2v_kv[299] = 94;
+                    lcpl_s2v_kv[300] = 100;
+                };
+                function fill_cpl_kv() {
+                    for ( let i = 0; i < 150; i++ ) { cpl_s2v_kv[i] = 0; };
+                    for ( let i = 150; i < 193; i++ ) { cpl_s2v_kv[i] = 1; };
+                    for ( let i = 193; i < 205; i++ ) { cpl_s2v_kv[i] = 2; };
+                    for ( let i = 205; i < 213; i++ ) { cpl_s2v_kv[i] = 3; };
+                    for ( let i = 213; i < 219; i++ ) { cpl_s2v_kv[i] = 4; };
+                    for ( let i = 219; i < 223; i++ ) { cpl_s2v_kv[i] = 5; };
+                    for ( let i = 223; i < 227; i++ ) { cpl_s2v_kv[i] = 6; };
+                    for ( let i = 227; i < 231; i++ ) { cpl_s2v_kv[i] = 7; };
+                    for ( let i = 231; i < 234; i++ ) { cpl_s2v_kv[i] = 8; };
+                    for ( let i = 234; i < 236; i++ ) { cpl_s2v_kv[i] = 9; };
+                    cpl_s2v_kv[236] = 10;
+                    for ( let i = 237; i < 239; i++ ) { cpl_s2v_kv[i] = 11; };
+                    for ( let i = 239; i < 241; i++ ) { cpl_s2v_kv[i] = 12; };
+                    for ( let i = 241; i < 243; i++ ) { cpl_s2v_kv[i] = 13; };
+                    cpl_s2v_kv[243] = 14;
+                    for ( let i = 244; i < 246; i++ ) { cpl_s2v_kv[i] = 15; };
+                    cpl_s2v_kv[246] = 16;
+                    cpl_s2v_kv[247] = 17;
+                    for ( let i = 248; i < 250; i++ ) { cpl_s2v_kv[i] = 18; };
+                    cpl_s2v_kv[250] = 19;
+                    cpl_s2v_kv[251] = 20;
+                    cpl_s2v_kv[252] = 21;
+                    cpl_s2v_kv[253] = 22;
+                    cpl_s2v_kv[254] = 23;
+                    cpl_s2v_kv[255] = 24;
+                    cpl_s2v_kv[256] = 25;
+                    cpl_s2v_kv[257] = 26;
+                    cpl_s2v_kv[258] = 27;
+                    cpl_s2v_kv[259] = 28;
+                    cpl_s2v_kv[260] = 29;
+                    cpl_s2v_kv[261] = 30;
+                    cpl_s2v_kv[262] = 32;
+                    cpl_s2v_kv[263] = 33;
+                    cpl_s2v_kv[264] = 34;
+                    cpl_s2v_kv[265] = 35;
+                    cpl_s2v_kv[266] = 36;
+                    cpl_s2v_kv[267] = 38;
+                    cpl_s2v_kv[268] = 39;
+                    cpl_s2v_kv[269] = 40;
+                    cpl_s2v_kv[270] = 42;
+                    cpl_s2v_kv[271] = 43;
+                    cpl_s2v_kv[274] = 48;
+                    cpl_s2v_kv[275] = 49;
+                    cpl_s2v_kv[276] = 51;
+                    cpl_s2v_kv[277] = 52;
+                    cpl_s2v_kv[278] = 54;
+                    cpl_s2v_kv[279] = 56;
+                    cpl_s2v_kv[280] = 57;
+                    cpl_s2v_kv[281] = 59;
+                    cpl_s2v_kv[282] = 61;
+                    cpl_s2v_kv[283] = 62;
+                    cpl_s2v_kv[284] = 64;
+                    cpl_s2v_kv[285] = 65;
+                    cpl_s2v_kv[286] = 67;
+                    cpl_s2v_kv[287] = 69;
+                    cpl_s2v_kv[288] = 71;
+                    cpl_s2v_kv[289] = 73;
+                    cpl_s2v_kv[290] = 74;
+                    cpl_s2v_kv[291] = 76;
+                    cpl_s2v_kv[292] = 78;
+                    cpl_s2v_kv[293] = 79;
+                    cpl_s2v_kv[294] = 81;
+                    cpl_s2v_kv[295] = 83;
+                    cpl_s2v_kv[296] = 85;
+                    cpl_s2v_kv[297] = 86;
+                    cpl_s2v_kv[298] = 88;
+                    cpl_s2v_kv[299] = 89;
+                    cpl_s2v_kv[300] = 100;
+                };
+
+                // switch based on rank
+                switch(rank) {
+                    case "LCPL":
+                        fill_lcpl_kv();
+                        var cftValue = lcpl_s2v_kv[cftScore];
+                        document.getElementById("cft-value").value = cftValue;
+                        break; 
+                    case "CPL":
+                        fill_cpl_kv();
+                        var cftValue = cpl_s2v_kv[cftScore];
+                        document.getElementById("cft-value").value = cftValue;
+                        break;
+                    default:
+                        //pass
+                }
+                calculatePhysicalToughnessTotal();
+            };
+
+            function calculatePhysicalToughnessTotal() {
+                // (2a + 2b) = total
+                var pftValue = document.getElementById("pft-value").value;
+                var cftValue = document.getElementById("cft-value").value;
+                var addTotal = +pftValue + +cftValue;
+                document.getElementById("physicalToughness-total").value = addTotal
+
+                // total * 1.25 = comp
+                var compTotal = Math.round(addTotal * 1.25); // round to nearest whole number, .49 down .5 up
+                document.getElementById("physicalToughness-comp").value = compTotal;
+
+                // update PES Score
+                calculateTotalPESScore();
+            };
+
+            // Mental Agility
+            function calculateCrsSvsValue() {
+                // glocal vars
+                var crsSvsNum = document.getElementById("crs-svs-num").value;
+
+                // calculate value
+                var crsSvsValue = crsSvsNum * 10;
+                if ( crsSvsValue > 30 ) { crsSvsValue = 30; };
+                document.getElementById("crs-svs-value").value = crsSvsValue;
+                
+                // update Mental Agility totals
+                calculateMentalAgilityTotal();
+            };
+
+            function calculateCrsGrdValue() {
+                // glocal vars
+                var crsGrdNum = document.getElementById("crs-grd-num").value;
+
+                // calculate value
+                var crsGrdValue = crsGrdNum * 10;
+                if ( crsGrdValue > 30 ) { crsGrdValue = 30; };
+                document.getElementById("crs-grd-value").value = crsGrdValue;
+
+                // update Mental Agility totals
+                calculateMentalAgilityTotal();
+            };
+
+            function calculateMentalAgilityTotal() {
+                // read values into glocal vars
+                var marinenetValue = document.getElementById("marinenet-value").value;
+                var degreesValue = document.getElementById("degrees-value").value;
+                var crsSvsValue = document.getElementById("crs-svs-value").value;
+                var crsGrdValue = document.getElementById("crs-grd-value").value;
+
+                // add total
+                var mentalAgilityTotal = +marinenetValue + +degreesValue + +crsSvsValue + +crsGrdValue;
+                document.getElementById("mentalAgility-total").value = mentalAgilityTotal;
+
+                // calculate composite score
+                var mentalAgilityComp = Math.round(mentalAgilityTotal / 3);
+                document.getElementById("mentalAgility-comp").value = mentalAgilityComp;
+
+                // update PES score
+                calculateTotalPESScore();
+            };
+
+            // CMD Input
+            function calculateMOSMSNValue() {
+                // calculate value
+                var mosMsnScore = document.getElementById("mos/msn-num").value;
+                var mosMsnValue = mosMsnScore * 50; 
+                document.getElementById("mos/msn-value").value = mosMsnValue;
+
+                // update CMD Input totals
+                calculateCommandInputTotal();
+            }
+
+            function calculateLeadershipValue() {
+                // calculate value
+                var leadershipScore = document.getElementById("leadership-num").value;
+                var leadershipValue = leadershipScore * 50;
+                document.getElementById("leadership-value").value = leadershipValue;
+
+                // update CMD Input totals
+                calculateCommandInputTotal();
+            }
+
+            function calculateCharacterValue() {
+                // calculate value
+                var characterScore = document.getElementById("character-num").value;
+                var characterValue = characterScore * 50;
+                document.getElementById("character-value").value = characterValue;
+
+                // update CMD Input totals
+                calculateCommandInputTotal();
+            }
+
+            function calculateCommandInputTotal() {
+
+                // total
+                var mosMsnValue = document.getElementById("mos/msn-value").value;
+                var leadershipValue = document.getElementById("leadership-value").value;
+                var characterValue = document.getElementById("character-value").value;
+                var commandInputTotal = +mosMsnValue + +leadershipValue + +characterValue;
+                document.getElementById("commandInput-total").value = commandInputTotal;
+
+                // comp
+                var commandInputComp = Math.round(commandInputTotal / 3);
+                document.getElementById("commandInput-comp").value = commandInputComp;
+
+                // update PES score
+                calculateTotalPESScore();
+            };
+
+            //Bonus
+            function calculateDIValue() {
+                // grab element group
+                var diGroup = document.getElementsByName("di");
+
+                // read value of element that is checked
+                for ( let i = 0; i < diGroup.length; i++ ) {
+                    if (diGroup[i].checked) {
+                        var diValue = diGroup[i].value;
+                    };
+                };
+
+                // update displayed value
+                document.getElementById("di-value").value = diValue;
+                
+                // update Bonus totals
+                calculateBonusTotal();
+            };
+
+            function calculateRSValue() {
+                // grab element group
+                var rsGroup = document.getElementsByName("rs");
+
+                // read value of element that is checked
+                for ( let i = 0; i < rsGroup.length; i++ ) {
+                    if (rsGroup[i].checked) {
+                        var rsValue = rsGroup[i].value;
+                    };
+                };
+
+                // update displayed value
+                document.getElementById("rs-value").value = rsValue;
+                
+                // update Bonus totals
+                calculateBonusTotal(); 
+            };
+            
+            function calculateMSGValue() {
+                // grab element group
+                var msgGroup = document.getElementsByName("msg");
+
+                // read value of element that is checked
+                for ( let i = 0; i < msgGroup.length; i++ ) {
+                    if (msgGroup[i].checked) {
+                        var msgValue = msgGroup[i].value;
+                    };
+                };
+
+                // update displayed value
+                document.getElementById("msg-value").value = msgValue;
+                
+                // update Bonus totals
+                calculateBonusTotal();
+            };
+
+            function calculateCIValue() {
+                // grab element group
+                var ciGroup = document.getElementsByName("ci");
+
+                // read value of element that is checked
+                for ( let i = 0; i < ciGroup.length; i++ ) {
+                    if (ciGroup[i].checked) {
+                        var ciValue = ciGroup[i].value;
+                    };
+                };
+
+                // update displayed value
+                document.getElementById("ci-value").value = ciValue;
+                
+                // update Bonus totals
+                calculateBonusTotal();
+            };
+
+            function calculateSecValue() {
+                // grab element group
+                var secGroup = document.getElementsByName("sec");
+
+                // read value of element that is checked
+                for ( let i = 0; i < secGroup.length; i++ ) {
+                    if (secGroup[i].checked) {
+                        var secValue = secGroup[i].value;
+                    };
+                };
+
+                // update displayed value
+                document.getElementById("sec-value").value = secValue;
+                
+                // update Bonus totals
+                calculateBonusTotal();
+            };
+
+            function calculateCmdRecBonusValue() {
+                // read glocal vars
+                var cmdRecBonusNum = document.getElementById("cmd-rec-bonus-num").value;
+                
+                // calculate value
+                var cmdRecBonusValue = cmdRecBonusNum * 20;
+                if ( cmdRecBonusValue > 100 ) { cmdRecBonusValue = 100; };
+                document.getElementById("cmd-rec-bonus-value").value = cmdRecBonusValue;
+
+                // update Bonus totals
+                calculateBonusTotal();
+            };
+
+            function calculateBonusTotal() {
+                // read values into glocal vars
+                var diValue = document.getElementById("di-value").value;
+                var rsValue = document.getElementById("rs-value").value;
+                var msgValue = document.getElementById("msg-value").value;
+                var ciValue = document.getElementById("ci-value").value;
+                var secValue = document.getElementById("sec-value").value;
+                var cmdRecBonusValue = document.getElementById("cmd-rec-bonus-value").value;
+
+                // calculate total (comp is the same)
+                var bonusTotal = +diValue + +rsValue + +msgValue + +ciValue + +secValue + +cmdRecBonusValue;
+                document.getElementById("bonus-total").value = bonusTotal;
+                if ( bonusTotal > 100 ) { bonusTotal = 100; };
+                var bonusComp = bonusTotal;
+                document.getElementById("bonus-comp").value = bonusComp;
+
+                // update PES score
+                calculateTotalPESScore();
+            };
+
+            // Total PES Score
+            function calculateTotalPESScore() {
+                // get calc values
+                var warfightingTotal = document.getElementById("warfighting-comp").value;
+                var physicalToughnessTotal = document.getElementById("physicalToughness-comp").value;
+                var mentalAgilityTotal = document.getElementById("mentalAgility-comp").value;
+                var commandInputTotal = document.getElementById("commandInput-comp").value;
+                var bonusTotal = document.getElementById("bonus-comp").value;
+
+                // calculate overall total
+                var pesTotal = +warfightingTotal + +physicalToughnessTotal + +mentalAgilityTotal + +commandInputTotal + +bonusTotal;
+                document.getElementById("pes-total").value = pesTotal;
+            };
+            
+        </script>
+    </body>
+</html>
